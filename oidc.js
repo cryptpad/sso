@@ -52,7 +52,7 @@ module.exports = {
 
             const params = client.callbackParams(url);
             delete params.state;
-            client.callback('http://localhost:3000/ssoauth', params, { code_verifier: token })
+            client.callback(opts.callbackURL, params, { code_verifier: token })
                     .then((tokenSet) => {
                 let j = tokenSet;
                 let c = tokenSet.claims();
