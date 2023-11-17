@@ -5,6 +5,7 @@ const JWT = require("jsonwebtoken");
 const Util = require("../../common-util");
 const config = require("../../load-config");
 const nThen = require("nthen");
+const fs = require('node:fs');
 
 const SSOUtils = module.exports;
 
@@ -18,10 +19,16 @@ SSOUtils.getOptions = () => {
     };
 };
 
-const TYPES = SSOUtils.TYPES = {
-    oidc: require('./oidc'),
-    saml: require('./saml')
-};
+const TYPES = SSOUtils.TYPES = {};
+
+try {
+    let protocolsDir = fs.readdirSync(__dirname + '/protocols');
+    protocolsDir.forEach((name) => {
+        if (!/.js$/.test(name)) { return; }
+        name = name.replace(/.js$/, '');
+        TYPES[name] = require(`./protocols/${name}`)(SSOUtils);
+    });
+} catch (err) { console.error(err); }
 
 const checkConfig = SSOUtils.checkConfig = (Env) => {
     return Env && Env.sso && Env.sso.enabled && Array.isArray(Env.sso.list) && Env.sso.list.length;
