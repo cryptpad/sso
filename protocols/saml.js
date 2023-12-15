@@ -3,20 +3,6 @@ const Util = require("../../../common-util");
 
 const TYPE = 'saml';
 
-/*
-// XXX XXX XXX SAML TEST
-
-* get metadata with "saml.generateServiceProviderMetadata()"
-* test site: https://samltest.id/upload.php
-  * upload metadata there
-* redirected to cryptpad with a POST to /ssoauth handled in http-worker.js
-
-
-
-
-
-*/
-
 const nameRef = 'urn:oid:2.16.840.1.113730.3.1.241';
 
 
