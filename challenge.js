@@ -179,6 +179,7 @@ register.complete = function (Env, body, cb) {
         const { sub, provider } = payload;
         ssoUser.password = Boolean(pw);
         ssoUser.complete = true;
+        ssoUser.block = publicKey;
         SSOUtils.updateUser(Env, provider, sub, ssoUser, w());
     }).nThen(() => {
         const { data, sub, provider } = payload;
