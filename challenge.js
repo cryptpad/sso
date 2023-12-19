@@ -142,6 +142,7 @@ register.complete = function (Env, body, cb) {
     const { publicKey, content } = body;
     const jwt = content.auth;
     const pw = content.hasPassword;
+    content.isSSO = true;
     let payload;
     let ssoUser;
     // XXX UPDATE sso_user add password boolean
@@ -164,16 +165,19 @@ register.complete = function (Env, body, cb) {
             ssoUser = user;
         }));
     }).nThen((w) => {
+        Block.writeLoginBlock(Env, content, w((err) => {
+            if (err) {
+                w.abort();
+                return void cb(err);
+            }
+        }));
+    }).nThen((w) => {
         const { sub, provider } = payload;
         SSOUtils.writeBlock(Env, publicKey, provider, sub, w((err) => {
             if (err) {
                 w.abort();
                 return void cb('SSO_BLOCK_WRITE');
             }
-        }));
-    }).nThen((w) => {
-        Block.writeLoginBlock(Env, content, w((err) => {
-            if (err) { w.abort(); }
         }));
     }).nThen((w) => {
         const { sub, provider } = payload;
