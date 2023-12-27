@@ -6,6 +6,23 @@ This allows to restrict registration to only SSO users or to display a "Register
 
 Users will still be able to create a personal password which will be used to make the "encryption key" of their drive secret from the SSO Administrators.
 
+## Features supported
+
+- OIDC and SAML SSO connectors
+- Allow to login using one or more SSO systems
+- Allow to restrict login to only SSO
+- Storing public key information of SSO users on the CryptPad server
+
+## Features not supported / Future Work
+
+- Store extra information from users coming from SSO
+- Allow to share documents with SSO users without the need to connect with them
+- Allow administrators to manage SSO users (see their storage use, delete their data, etc..)
+- Allow to synchronize OIDC roles / groups with cryptpad teams
+- Additional SSO protocols
+
+If you are interested by these extra features and wishing to sponsor them, contact XWiki SAS at sales@cryptpad.fr.
+
 ## Manual installation
 
 Go the cryptpad/lib/plugins directory on your server
