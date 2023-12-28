@@ -21,7 +21,7 @@ Users will still be able to create a personal password which will be used to mak
 - Allow to synchronize OIDC roles / groups with cryptpad teams
 - Additional SSO protocols
 
-If you are interested by these extra features and wishing to sponsor them, contact XWiki SAS at sales@cryptpad.fr.
+If you are interested by these extra features and wishing to sponsor them, contact XWiki SAS at sales@cryptpad.org
 
 ## Manual installation
 
@@ -35,20 +35,20 @@ git clone https://github.com/cryptpad/sso/
 Go to the cryptpad/config directory on your server
 
 ```
-cd cryptpad/config
+cd ../../config
 cp sso.example.js sso.js
 ```
 
-and edit the sso.js to set the credentials to your SSO server:
+and edit the `sso.js` to set the credentials to your SSO server:
 
-## Create an OpenID Connect COnfiguration on your authentication server
+## Create an OpenID Connect Configuration on your authentication server
 
 The SSO module has been succesfully tested using KeyCloak and Univention UCS using default settings.
 When setting up the client credentials on your OpenIDC Connect server the following redirect URI needs to be set
 
-https://<yourdomain>/ssoauth
+`https://<yourdomain>/ssoauth`
 
-(In case you are still using a local test http server the URL should be http://<yourdomain>:<yourport>/ssoauth)
+(In case you are still using a local test http server the URL should be `http://<yourdomain>:<yourport>/ssoauth`)
 
 ### sso.js sample configurations
 
