@@ -25,21 +25,28 @@ If you are interested in these extra features and wish to sponsor them, contact 
 
 ## Manual installation
 
-Go the cryptpad/lib/plugins directory on your server
+1. Go the cryptpad/lib/plugins directory on your server
 
 ```
 cd cryptpad/lib/plugins
 git clone https://github.com/cryptpad/sso/
 ```
 
-Go to the cryptpad/config directory on your server
+2. Go to the cryptpad/config directory on your server
 
 ```
 cd ../../config
 cp sso.example.js sso.js
 ```
 
-and edit the `sso.js` to set the credentials to your SSO server:
+3. Edit the `sso.js` config file to set the credentials to your SSO server ([more instructions here](#ssojs-sample-configurations))
+
+4. Flush the cache on your Cryptpad instance
+
+On the web interface, login, and then go to:
+Administration > General (default) > Flush HTTP Cache > click "FLUSH CACHE"
+
+> At this point you may be done, but if issues persist try restarting your Cryptpad instance with `systemctl restart ...`, `service ... restart`, or `reboot`
 
 ## Create an OpenID Connect Configuration on your authentication server
 
