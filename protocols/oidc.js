@@ -31,12 +31,14 @@ module.exports = (SSOUtils) => {
         auth: (Env, cfg, cb) => {
             getClient(cfg, (err, client) => {
                 if (err) { return void cb ('E_OIDC_CONNECT'); }
+                let username_scope = cfg.username_scope || 'profile';
+                let email_scope = cfg.email_scope || 'email'; // This is not yet used
 
                 const generators = OID.generators;
                 const code_verifier = generators.codeVerifier();
                 const code_challenge = generators.codeChallenge(code_verifier);
                 const url = client.authorizationUrl({
-                    scope: 'openid email profile',
+                    scope: `openid ${username_scope} ${email_scope}`,
                     resource: opts.callbackURL,
                     access_type: 'offline',
                     code_challenge,
@@ -52,11 +54,15 @@ module.exports = (SSOUtils) => {
 
                 const params = client.callbackParams(url);
                 delete params.state;
+
+                let username_claim = cfg.username_claim || 'name';
+                let email_claim = cfg.email_claim || 'email'; // This is not yet used
+
                 client.callback(opts.callbackURL, params, { code_verifier: token })
                         .then((tokenSet) => {
                     let j = tokenSet;
                     let c = tokenSet.claims();
-                    let name = c.name;
+                    let name = c[username_claim];
                     const end = () => {
                         cb(void 0, {
                             id: c.sub,
