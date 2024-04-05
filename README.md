@@ -1,27 +1,27 @@
 # CryptPad SSO Plugin
 
-The CryptPad SSO plugin can be manually installed to allow a CryptPad instance to be connected to an SSO system.
+The CryptPad SSO plugin can be manually installed to allow a CryptPad instance to be connected to a single sign-on (SSO) system.
 
-This allows to restrict registration to only SSO users or to display a "Register with SSONAME" button on the connection and registration screen.
+This allows to restrict registrations to only SSO users or to display a “Register with SSONAME” button on the connection and registration screen.
 
-Users will still be able to create a personal password which will be used to make the "encryption key" of their drive secret from the SSO Administrators.
+Users will still be able to create a personal password which will be used to derive the “encryption key” of their drive secret from SSO Administrators.
 
 ## Features supported
 
-- OIDC and SAML SSO connectors
-- Allow to login using one or more SSO systems
-- Allow to restrict login to only SSO
-- Storing public key information of SSO users on the CryptPad server
+- OIDC and SAML SSO connectors;
+- Allow logging in using one or more SSO systems;
+- Allow restricting login to only SSO;
+- Store public key information of SSO users on the CryptPad server.
 
 ## Features not supported / Future Work
 
-- Store extra information from users coming from SSO
-- Allow to share documents with SSO users without the need to connect with them
-- Allow administrators to manage SSO users (see their storage use, delete their data, etc..)
-- Allow to synchronize OIDC roles / groups with cryptpad teams
-- Additional SSO protocols
+- Store extra information from users coming from SSO;
+- Allow sharing documents with SSO users without the need to connect with them;
+- Allow administrators to manage SSO users (see their storage use, delete their data, etc.);
+- Allow synchronizing OIDC roles/groups with CryptPad teams;
+- Additional SSO protocols.
 
-If you are interested by these extra features and wishing to sponsor them, contact XWiki SAS at sales@cryptpad.org
+If you are interested in these extra features and wish to sponsor them, contact XWiki SAS at sales@cryptpad.org
 
 ## Manual installation
 
@@ -43,7 +43,7 @@ and edit the `sso.js` to set the credentials to your SSO server:
 
 ## Create an OpenID Connect Configuration on your authentication server
 
-The SSO module has been succesfully tested using KeyCloak and Univention UCS using default settings.
+The SSO module has been successfully tested using KeyCloak and Univention UCS using default settings.
 When setting up the client credentials on your OpenIDC Connect server the following redirect URI needs to be set
 
 `https://<yourdomain>/ssoauth`
@@ -52,7 +52,7 @@ When setting up the client credentials on your OpenIDC Connect server the follow
 
 ### sso.js sample configurations
 
-Here are example configuration files for sso.js with examples for KeyCloak, Univention UCS and SAML
+Here follows an example configuration file for `sso.js` showing examples for KeyCloak, Univention UCS and SAML:
 
 ```
 // SPDX-FileCopyrightText: 2023 XWiki CryptPad Team <contact@cryptpad.org> and contributors
