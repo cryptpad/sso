@@ -41,6 +41,7 @@ module.exports = (SSOUtils) => {
                     access_type: 'offline',
                     code_challenge,
                     code_challenge_method: 'S256',
+                    state: Math.random().toString(36), // Just create a state for providers that require it...
                 });
 
                 cb(void 0, { url: url, token: code_verifier });
