@@ -33,12 +33,14 @@ try {
 const checkConfig = SSOUtils.checkConfig = (Env) => {
     return Env && Env.sso && Env.sso.enabled && Array.isArray(Env.sso.list) && Env.sso.list.length;
 };
+
 SSOUtils.getProviderConfig = (Env, provider) => {
     if (!checkConfig(Env)) { return; }
     if (!provider) { return; }
     const data = Env.sso.list.find((cfg) => { return cfg.name === provider; });
     return data;
 };
+
 SSOUtils.isValidConfig = (cfg) => {
     if (!cfg) { return; }
     if (!cfg.type) { return; }
@@ -55,9 +57,11 @@ SSOUtils.deleteRequest = (Env, id) => {
         // XXX log?
     });
 };
+
 SSOUtils.readRequest = (Env, id, cb) => {
     SSO.request.read(Env, id, cb);
 };
+
 SSOUtils.writeRequest = (Env, data, cb) => {
     if (!data || !data.id || !data.type) { return void cb ('INVALID_REQUEST'); }
     const id = data.id;
@@ -83,15 +87,18 @@ SSOUtils.writeUser = (Env, provider, id, cb) => {
         cb(void 0, { seed });
     });
 };
+
 SSOUtils.readUser = (Env, provider, id, cb) => {
     SSO.user.read(Env, provider, id, (err, user) => {
         if (err) { return void cb(err); }
         cb(void 0, Util.tryParse(user));
     });
 };
+
 SSOUtils.deleteUser = (Env, provider, id, cb) => {
     SSO.user.archive(Env, provider, id, cb);
 };
+
 SSOUtils.updateUser = (Env, provider, id, data, cb) => {
     SSO.user.archive(Env, provider, id, () => {
         SSO.user.write(Env, provider, id, JSON.stringify(data), (err) => {
@@ -110,6 +117,7 @@ SSOUtils.writeBlock = (Env, id, provider, ssoID, cb) => {
         cb();
     });
 };
+
 SSOUtils.readBlock = (Env, id, cb) => {
     SSO.block.read(Env, id, (err, blockData) => {
         if (err && err !== 'ENOENT' && err.code !== 'ENOENT') {
@@ -122,6 +130,7 @@ SSOUtils.readBlock = (Env, id, cb) => {
         cb(void 0, Util.tryParse(blockData));
     });
 };
+
 SSOUtils.deleteBlock = (Env, id, cb) => {
     SSO.block.archive(Env, id, (err) => {
         if (err) { return void cb(err); }
@@ -150,6 +159,7 @@ SSOUtils.deleteAccount = (Env, publicKey, cb) => {
         });
     });
 };
+
 SSOUtils.restoreAccount = (Env, publicKey, cb) => {
     SSO.block.restore(Env, publicKey, (err) => {
         if (err && err.code === 'ENOENT') { return void cb(); }
@@ -163,7 +173,6 @@ SSOUtils.restoreAccount = (Env, publicKey, cb) => {
         });
     });
 };
-
 
 // Store the SSO data (tokens, etc.) in a JWT while waiting for the user's CryptPad password
 SSOUtils.createJWT = (Env, ssoId, provider, data, cb) => {
@@ -182,6 +191,7 @@ SSOUtils.createJWT = (Env, ssoId, provider, data, cb) => {
         cb(void 0, token);
     });
 };
+
 SSOUtils.checkJWT = (Env, token, cb) => {
     JWT.verify(token, Env.bearerSecret, {
         algorithm: 'HS512',
@@ -229,4 +239,3 @@ SSOUtils.makeSession = (Env, publicKey, provider, ssoData, cb) => {
     });
 
 };
-
