@@ -77,7 +77,9 @@ module.exports = {
         url: 'https://<keycloakserver/realms/<realm>',
         client_id: "cryptpad",
         client_secret: "<clientsecret>",
-        jwt_alg: 'RS256'
+        jwt_alg: 'RS256',
+        username_scope: 'profile',  (optional)
+        username_claim: 'name', (optional)
       },
     /*
 
