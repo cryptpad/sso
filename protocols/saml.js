@@ -3,9 +3,6 @@ const Util = require("../../../common-util");
 
 const TYPE = 'saml';
 
-const nameRef = 'urn:oid:2.16.840.1.113730.3.1.241';
-
-
 module.exports = (SSOUtils) => {
     const opts = SSOUtils.getOptions();
     const getClient = (cfg, cb) => {
@@ -46,6 +43,8 @@ module.exports = (SSOUtils) => {
                 SSOUtils.deleteRequest(Env, samltoken);
                 if (err || !value) { return void cb('EINVAL'); }
                 const data = Util.tryParse(value);
+
+                const nameRef = cfg.username_attr || 'displayName' || 'urn:oid:2.16.840.1.113730.3.1.241';
 
                 getClient(cfg, (err, client) => {
                     if (err) { return void cb ('E_OIDC_CONNECT'); }
