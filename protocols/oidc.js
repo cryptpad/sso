@@ -30,7 +30,7 @@ module.exports = (SSOUtils) => {
         },
         auth: (Env, cfg, cb) => {
             getClient(cfg, (err, client) => {
-                if (err) { return void cb ('E_OIDC_CONNECT'); }
+                if (err) { return void cb (err); }
                 let username_scope = cfg.username_scope || 'profile';
                 let email_scope = cfg.email_scope || 'email'; // This is not yet used
 
@@ -51,7 +51,7 @@ module.exports = (SSOUtils) => {
         },
         authCb: (Env, cfg, token, url, cookies, cb) => {
             getClient(cfg, (err, client) => {
-                if (err) { return void cb ('E_OIDC_CONNECT'); }
+                if (err) { return void cb (err); }
 
                 const params = client.callbackParams(url);
                 delete params.state;
