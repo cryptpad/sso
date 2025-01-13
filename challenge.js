@@ -29,12 +29,15 @@ auth.complete = function (Env, body, cb, req, res) {
     idp.auth(Env, cfg, (err, obj) => {
         if (err) { return void cb(err); } // TODO log
 
-        let { url, token } = obj;
+        let { url, token, nonce } = obj;
 
+        let original_token = token;
         if (!token) { token = Util.uid() + Util.uid(); }
 
         SSOUtils.writeRequest(Env, {
             id: token,
+            code: original_token,
+            nonce: nonce,
             type: idp.type,
             provider: provider,
             publicKey: publicKey,
@@ -79,7 +82,11 @@ authCb.complete = function (Env, body, cb, req) {
         const idp = TYPES[data.type];
         const register = data.register;
         const provider = data.provider;
-        idp.authCb(Env, cfg, ssotoken, url, cookies, (err, obj) => {
+        const tokens = {
+            nonce: data.nonce,
+            code: data.code
+        };
+        idp.authCb(Env, cfg, tokens, url, cookies, (err, obj) => {
             if (err) { return void cb(err); }
             const {id, idpData, name} = obj;
 

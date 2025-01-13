@@ -44,6 +44,7 @@ module.exports = (SSOUtils) => {
                 if (err || !value) { return void cb('EINVAL'); }
                 const data = Util.tryParse(value);
 
+                // eslint-disable-next-line no-constant-binary-expression
                 const nameRef = cfg.username_attr || 'displayName' || 'urn:oid:2.16.840.1.113730.3.1.241';
 
                 getClient(cfg, (err, client) => {

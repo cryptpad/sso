@@ -67,6 +67,8 @@ SSOUtils.writeRequest = (Env, data, cb) => {
     const id = data.id;
     const value = {
         type: data.type,
+        code: data.code,
+        nonce: data.nonce,
         register: data.register,
         provider: data.provider,
         publicKey: data.publicKey,
