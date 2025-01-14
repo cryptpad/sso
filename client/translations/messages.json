@@ -1,0 +1,5 @@
+{
+    "admin_category":"SSO",
+    "enable_global":"Enable SSO login",
+    "admin_ssoEnable":"Enable SSO login on this CryptPad instance"
+}
