@@ -48,6 +48,9 @@ SSO.addAdminCommands = (/*Env*/) => {
             cb(_err);
         });
     };
+    commands.LIST_SSO = (Env, Server, cb) => {
+        cb(void 0, Env.sso);
+    };
 
     return commands;
 };

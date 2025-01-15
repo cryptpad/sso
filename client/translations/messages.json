@@ -1,5 +1,19 @@
 {
+    "oidc":"OpenID Connect",
+    "saml":"SAML",
     "admin_category":"SSO",
     "enable_global":"Enable SSO login",
-    "admin_ssoEnable":"Enable SSO login on this CryptPad instance"
+    "admin_ssoEnable":"Enable SSO login on this CryptPad instance",
+    "config_global":"SSO configuration",
+    "config_enforced":"Config which type of users are allowed to log in to this instance",
+    "config_enforced_all":"All users",
+    "config_enforced_sso":"Only SSO users",
+    "config_password":"SSO users can also add a password specific to their CryptPad account for extra security. If not used, administrators of the identity provider would be able to access their CryptPad data.",
+    "config_password_no":"Disable password",
+    "config_password_yes":"Allow password",
+    "config_password_force":"Force password",
+    "list_providers":"Identity providers",
+    "provider_id":"Identifier",
+    "provider_type":"Type",
+    "provider_url":"Base URL"
 }
