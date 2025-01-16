@@ -1,8 +1,9 @@
 define([
     '/api/config',
     '/common/common-util.js',
+    '/common/common-interface.js',
     '/customize/messages.js'
-], function (ApiConfig, Util, Messages) {
+], function (ApiConfig, Util, UI, Messages) {
     return function (MyMessages) {
         const extensions = {};
 
@@ -21,7 +22,8 @@ define([
                     cb(e || response.error);
                     return console.error(e, response);
                 }
-                cb(void 0, response);
+                if (!Array.isArray(response)) { return void cb('EINVAL'); }
+                cb(void 0, response[0]);
             });
         };
 
@@ -167,11 +169,12 @@ define([
             id: 'sso-list',
             title: MyMessages.list_providers,
             getContent: (common, blocks, utils, cb) => {
-                const { $, APP, UI } = utils;
+                const { $, UI } = utils;
                 const sframeChan = common.getSframeChannel();
 
+                let redraw = () => {};
+
                 const addForm = (isEdit) => {
-                    let editValues;
                     const form = blocks.form();
                     const onChangeEvt = Util.mkEvent();
                     const uid = Util.uid();
@@ -191,27 +194,109 @@ define([
                     });
                     const typeLabel = blocks.labelledInput(MyMessages.provider_type, typeInput);
 
+                    let getValues = () => {};
+
+                    // SAML
                     onChangeEvt.reg(type => {
+                        if (type !== 'saml') { return; }
+                        $(form).empty();
+
+                        // URL
+                        const urlInput = blocks.input();
+                        const urlLabel = blocks.labelledInput(MyMessages.provider_url, urlInput);
+
+                        // Issuer
+                        const issuerInput = blocks.input();
+                        const issuerLabel = blocks.labelledInput(MyMessages.provider_saml_issuer, issuerInput);
+
+                        // IdP cert
+                        const idpcInput = blocks.textarea();
+                        const idpcLabel = blocks.labelledInput(MyMessages.provider_saml_idpcert, idpcInput);
+
+                        // Service Provider cert
+                        const spcInput = blocks.textarea();
+                        const spcLabel = blocks.labelledInput(MyMessages.provider_saml_providercert, spcInput);
+
+                        // Private key
+                        const pkInput = blocks.textarea();
+                        const pkLabel = blocks.labelledInput(MyMessages.provider_saml_private, pkInput);
+
+                        if (isEdit) {
+                            urlInput.value = isEdit.url;
+                            issuerInput.value = isEdit.issuer || '';
+                            idpcInput.value = isEdit.cert || '';
+                            spcInput.value = isEdit.signingCert || '';
+                            pkInput.value = isEdit.privateKey || '';
+                        }
+
+                        getValues = () => {
+                            return {
+                                name: idInput.value,
+                                type: 'saml',
+                                url: urlInput.value,
+                                issuer: issuerInput.value,
+                                cert: idpcInput.value,
+                                signingCert: spcInput.value,
+                                privateKey: pkInput.value
+                            };
+                        };
+
+                        $(form).append([urlLabel, issuerLabel, idpcLabel, spcLabel, pkLabel]);
+                    });
+                    // OIDC
+                    onChangeEvt.reg(type => {
+                        if (type !== 'oidc') { return; }
                         $(form).empty();
                         // URL
                         const urlInput = blocks.input();
                         const urlLabel = blocks.labelledInput(MyMessages.provider_url, urlInput);
 
-                        if (type === 'saml') {
+                        // Client ID
+                        const cidInput = blocks.input();
+                        const cidLabel = blocks.labelledInput(MyMessages.provider_oidc_id, cidInput);
 
-                            if (isEdit) {
-                                urlInput.value = isEdit.url;
-                            }
-                            $(form).append([urlLabel]);
-                            return;
-                        }
+                        // Client Secret
+                        const secretInput = blocks.input();
+                        const secretLabel = blocks.labelledInput(MyMessages.provider_oidc_secret, secretInput);
 
+                        // ID Token alg
+                        const idAlgInput = blocks.input({placeholder:'PS256'});
+                        const idAlgLabel = blocks.labelledInput(MyMessages.provider_oidc_idalg, idAlgInput);
 
+                        // User Info alg
+                        const userAlgInput = blocks.input({placeholder:'PS256'});
+                        const userAlgLabel = blocks.labelledInput(MyMessages.provider_oidc_useralg, userAlgInput);
+
+                        // PKCE
+                        const pkce = blocks.checkbox(`sso-pkce-${uid}`, MyMessages.provider_oidc_pkce, true);
+
+                        // Nonce
+                        const nonce = blocks.checkbox(`sso-nonce-${uid}`, MyMessages.provider_oidc_nonce, true);
 
                         if (isEdit) {
-                            urlInput.value = isEdit.url;
+                            urlInput.value = isEdit.url || '';
+                            cidInput.value = isEdit.client_id || '';
+                            secretInput.value = isEdit.client_secret || '';
+                            idAlgInput.value = isEdit.id_token_alg || isEdit.jwt_alg || '';
+                            userAlgInput.value = isEdit.userinfo_token_alg || isEdit.jwt_alg || '';
+                            $(pkce).find('input').prop('checked', isEdit.use_pkce !== false);
+                            $(nonce).find('input').prop('checked', isEdit.use_nonce !== false);
                         }
-                        $(form).append([urlLabel]);
+
+                        getValues = () => {
+                            return {
+                                name: idInput.value,
+                                type: 'oidc',
+                                url: urlInput.value,
+                                client_id: cidInput.value,
+                                client_secret: secretInput.value,
+                                id_token_alg: idAlgInput.value || isEdit.jwt_alg || undefined,
+                                userinfo_token_alg: userAlgInput.value || isEdit.jwt_alg || undefined,
+                                use_nonce: $(nonce).find('input').is(':checked'),
+                                use_pkce: $(pkce).find('input').is(':checked')
+                            };
+                        };
+                        $(form).append([urlLabel, cidLabel, secretLabel, idAlgLabel, userAlgLabel, pkce, nonce]);
                     });
 
                     if (isEdit) {
@@ -221,21 +306,114 @@ define([
                         $(typeInput).find(`[value="${isEdit.type}"]`).prop('checked', true);
                     }
 
-                    // XXX button "ADD" or "EDIT" and "REMOVE"
-                    return blocks.form([idLabel, typeLabel, form]);
+                    const edit = blocks.button('primary', 'fa-pencil', Messages.tag_edit);
+                    const remove = blocks.button('danger', 'fa-trash', Messages.fc_remove);
+                    const $edit = $(edit), $remove = $(remove);
+                    Util.onClickEnter($edit, () => {
+                        $edit.prop('disabled', 'disabled');
+                        let v = getValues();
+                        sframeChan.query('Q_ADMIN_RPC', {
+                            cmd: 'ADD_SSO_DECREE',
+                            data: ['UPDATE_PROVIDER', {
+                                id: v.name,
+                                value: v
+                            }]
+                        }, function (e, response) {
+                            $edit.prop('disabled', false);;
+                            if (e || response.error) {
+                                UI.warn(Messages.error);
+                                console.error(e, response);
+                            } else {
+                                UI.log(Messages.ui_success);
+                            }
+                            redraw();
+                        });
+                    });
+
+                    Util.onClickEnter($remove, () => {
+                        $remove.prop('disabled', 'disabled');
+                        UI.confirm(MyMessages.provider_remove_confirm, yes => {
+                            if (!yes) {
+                                return void $remove.prop('disabled', false);
+                            }
+                            sframeChan.query('Q_ADMIN_RPC', {
+                                cmd: 'ADD_SSO_DECREE',
+                                data: ['UPDATE_PROVIDER', {
+                                    id: isEdit.name,
+                                    value: false
+                                }]
+                            }, function (e, response) {
+                                $remove.prop('disabled', false);;
+                                if (e || response.error) {
+                                    UI.warn(Messages.error);
+                                    console.error(e, response);
+                                } else {
+                                    UI.log(Messages.ui_success);
+                                }
+                                redraw();
+                            });
+                        });
+                    });
+
+                    const nav = blocks.nav([edit, remove]);
+
+                    return blocks.form([idLabel, typeLabel, form], nav);
                 };
 
                 const list = blocks.form();
                 list.classList.add('plugin-sso-provider-list');
-                getData(sframeChan, (err, obj) => {
-                    if (err || !obj[0]) { return; }
-                    obj[0].list.forEach(data => {
-                        list.appendChild(addForm(data));
+                const listLabel = blocks.labelledInput(MyMessages.provider_list, list);
+
+                redraw = () => {
+                    $(list).empty();
+                    getData(sframeChan, (err, obj) => {
+                        if (err || !obj || !Array.isArray(obj.list)) { return; }
+                        if (!obj.list.length) {
+                            $(listLabel).hide();
+                        } else {
+                            $(listLabel).show();
+                        }
+                        obj.list.forEach(data => {
+                            list.appendChild(addForm(data));
+                        });
+                    });
+                };
+                redraw();
+
+
+                // ID
+                const newInput = blocks.input();
+                const newButton = blocks.button('primary', 'fa-plus', Messages.tag_add);
+                const newMerge = blocks.inputButton(newInput, newButton, {onEnterDelegate:true});
+                const newLabel = blocks.labelledInput(MyMessages.provider_new, newMerge);
+
+                const $inputId = $(newInput).on('input', () => {
+                    const val = $inputId.val().replace(/[^a-zA-Z-_ ]/g, '');
+                    $inputId.val(val);
+                });
+
+                const $newButton = $(newButton).click(function () {
+                    const value = $(newInput).val().trim();
+                    $newButton.prop('disabled', 'disabled');
+                    sframeChan.query('Q_ADMIN_RPC', {
+                        cmd: 'ADD_SSO_DECREE',
+                        data: ['UPDATE_PROVIDER', {
+                            id: value,
+                            value: { name: value }
+                        }]
+                    }, function (e, response) {
+                        $newButton.prop('disabled', false);;
+                        if (e || response.error) {
+                            UI.warn(Messages.error);
+                            console.error(e, response);
+                        } else {
+                            UI.log(Messages.ui_success);
+                        }
+                        redraw();
                     });
                 });
-                let f = addForm();
 
-                cb(blocks.form([f, list]));
+                cb(blocks.form([newLabel, listLabel]));
             }
         }];
 

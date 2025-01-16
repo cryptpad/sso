@@ -32,6 +32,8 @@ SSO.addAdminCommands = (/*Env*/) => {
         try {
             changed = SSODecrees.handleCommand(Env, decree) || false;
         } catch (err) {
+            console.error(err);
+            Env.Log.error('SSO_DECREE_ERROR', err);
             return void cb(err);
         }
 

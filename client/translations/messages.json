@@ -13,7 +13,19 @@
     "config_password_yes":"Allow password",
     "config_password_force":"Force password",
     "list_providers":"Identity providers",
+    "provider_list":"Current providers",
+    "provider_new":"Add new SSO provider",
     "provider_id":"Identifier",
     "provider_type":"Type",
-    "provider_url":"Base URL"
+    "provider_url":"Base URL",
+    "provider_oidc_id":"Client ID",
+    "provider_oidc_secret":"Client secret",
+    "provider_oidc_idalg":"ID token algorithm",
+    "provider_oidc_useralg":"User Info response algorithm",
+    "provider_oidc_pkce":"Use PKCE code challenge",
+    "provider_oidc_nonce":"Use nonce",
+    "provider_saml_issuer":"Issuer ID",
+    "provider_saml_idpcert":"IdP certificate",
+    "provider_saml_providercert":"Service provider certificate",
+    "provider_saml_private":"Private signing key"
 }

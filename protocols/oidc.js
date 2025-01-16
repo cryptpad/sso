@@ -71,7 +71,7 @@ module.exports = (SSOUtils) => {
 
                 if (use_pkce) {
                     config.code_challenge = code_challenge;
-                    config.code_challenge_method =  'S256';
+                    config.code_challenge_method = 'S256';
                 }
                 if (use_nonce) {
                     config.nonce = nonce;
