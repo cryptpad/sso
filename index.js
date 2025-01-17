@@ -9,7 +9,7 @@ let config = {};
 try {
     config = require("../../../config/sso");
 } catch (e) {
-    console.log("SSO config not found", e);
+    //console.log("SSO config not found");
 }
 
 
