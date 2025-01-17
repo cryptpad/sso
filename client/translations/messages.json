@@ -27,5 +27,6 @@
     "provider_saml_issuer":"Issuer ID",
     "provider_saml_idpcert":"IdP certificate",
     "provider_saml_providercert":"Service provider certificate",
-    "provider_saml_private":"Private signing key"
+    "provider_saml_private":"Private signing key",
+    "provider_remove_confirm": "Remove this identity provider?"
 }
