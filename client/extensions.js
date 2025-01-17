@@ -394,6 +394,7 @@ define([
 
                 const $newButton = $(newButton).click(function () {
                     const value = $(newInput).val().trim();
+                    if (!value) { return; }
                     $newButton.prop('disabled', 'disabled');
                     sframeChan.query('Q_ADMIN_RPC', {
                         cmd: 'ADD_SSO_DECREE',
