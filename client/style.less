@@ -1,4 +1,5 @@
 @import (reference) "../customize/src/less2/include/colortheme-all.less";
+@import (reference) "../customize/src/less2/include/variables.less";
 
 body {
     #cp-sidebarlayout-container #cp-sidebarlayout-rightside .cp-sidebarlayout-element[data-item] .cp-sidebar-form.plugin-sso-provider-list {
@@ -6,8 +7,10 @@ body {
         & > div {
             padding: 0.5rem;
             padding-top: 0;
-            margin: 0.5rem;
-            border: 1px solid @cryptpad_text_col;
+            margin: 0.5rem 0;
+            // border: 1px solid @cryptpad_text_col;
+            background-color: fade(@cryptpad_text_col, 10%);
+            border-radius: @variables_radius_L;
         }
     }
 }
