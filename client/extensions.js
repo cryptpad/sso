@@ -10,7 +10,7 @@ define([
         extensions.ADMIN_CATEGORY = [{
             id: 'sso',
             name: MyMessages.admin_category,
-            icon: 'fa fa-server',
+            icon: 'fa fa-id-badge',
             content: ['sso-enable','sso-config','sso-list']
         }];
         const getData = (sframeChan, cb) => {
