@@ -11,6 +11,9 @@ body {
             // border: 1px solid @cryptpad_text_col;
             background-color: fade(@cryptpad_text_col, 10%);
             border-radius: @variables_radius_L;
+            &:not(:last-child) {
+                margin-right: 0.5em;
+            }
         }
     }
 }
