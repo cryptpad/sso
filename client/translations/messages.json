@@ -24,9 +24,12 @@
     "provider_oidc_useralg":"User Info response algorithm",
     "provider_oidc_pkce":"Use PKCE code challenge",
     "provider_oidc_nonce":"Use nonce",
+    "provider_oidc_userscope":"Username Scope",
+    "provider_oidc_userclaim":"Username Claim",
     "provider_saml_issuer":"Issuer ID",
     "provider_saml_idpcert":"IdP certificate",
     "provider_saml_providercert":"Service provider certificate",
     "provider_saml_private":"Private signing key",
+    "provider_saml_name":"Username attribute",
     "provider_remove_confirm": "Remove this identity provider?"
 }

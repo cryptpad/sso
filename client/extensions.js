@@ -221,12 +221,17 @@ define([
                         const pkInput = blocks.textarea();
                         const pkLabel = blocks.labelledInput(MyMessages.provider_saml_private, pkInput);
 
+                        // User name
+                        const nameInput = blocks.input();
+                        const nameLabel = blocks.labelledInput(MyMessages.provider_saml_name, nameInput);
+
                         if (isEdit) {
                             urlInput.value = isEdit.url;
                             issuerInput.value = isEdit.issuer || '';
                             idpcInput.value = isEdit.cert || '';
                             spcInput.value = isEdit.signingCert || '';
                             pkInput.value = isEdit.privateKey || '';
+                            nameInput.value = isEdit.username_attr || '';
                         }
 
                         getValues = () => {
@@ -237,7 +242,8 @@ define([
                                 issuer: issuerInput.value,
                                 cert: idpcInput.value,
                                 signingCert: spcInput.value,
-                                privateKey: pkInput.value
+                                privateKey: pkInput.value,
+                                username_attr: nameInput.value
                             };
                         };
 
@@ -264,7 +270,7 @@ define([
                         const idAlgLabel = blocks.labelledInput(MyMessages.provider_oidc_idalg, idAlgInput);
 
                         // User Info alg
-                        const userAlgInput = blocks.input({placeholder:'PS256'});
+                        const userAlgInput = blocks.input();
                         const userAlgLabel = blocks.labelledInput(MyMessages.provider_oidc_useralg, userAlgInput);
 
                         // PKCE
@@ -272,6 +278,12 @@ define([
 
                         // Nonce
                         const nonce = blocks.checkbox(`sso-nonce-${uid}`, MyMessages.provider_oidc_nonce, true);
+
+                        // User name
+                        const userScopeInput = blocks.input({placeholder:'profile'});
+                        const userScopeLabel = blocks.labelledInput(MyMessages.provider_oidc_userscope, userScopeInput);
+                        const userClaimInput = blocks.input({placeholder:'name'});
+                        const userClaimLabel = blocks.labelledInput(MyMessages.provider_oidc_userclaim, userClaimInput);
 
                         if (isEdit) {
                             urlInput.value = isEdit.url || '';
@@ -281,6 +293,8 @@ define([
                             userAlgInput.value = isEdit.userinfo_token_alg || isEdit.jwt_alg || '';
                             $(pkce).find('input').prop('checked', isEdit.use_pkce !== false);
                             $(nonce).find('input').prop('checked', isEdit.use_nonce !== false);
+                            userScopeInput.value = isEdit.username_scope || '';
+                            userClaimInput.value = isEdit.username_claim || '';
                         }
 
                         getValues = () => {
@@ -293,10 +307,12 @@ define([
                                 id_token_alg: idAlgInput.value || isEdit.jwt_alg || undefined,
                                 userinfo_token_alg: userAlgInput.value || isEdit.jwt_alg || undefined,
                                 use_nonce: $(nonce).find('input').is(':checked'),
-                                use_pkce: $(pkce).find('input').is(':checked')
+                                use_pkce: $(pkce).find('input').is(':checked'),
+                                username_scope: userScopeInput.value,
+                                username_claim: userClaimInput.value,
                             };
                         };
-                        $(form).append([urlLabel, cidLabel, secretLabel, idAlgLabel, userAlgLabel, pkce, nonce]);
+                        $(form).append([urlLabel, cidLabel, secretLabel, idAlgLabel, userAlgLabel, pkce, nonce, userScopeLabel, userClaimLabel]);
                     });
 
                     if (isEdit) {

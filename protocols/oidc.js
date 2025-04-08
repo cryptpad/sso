@@ -15,7 +15,7 @@ module.exports = (SSOUtils) => {
             Env.Log.verbose('DISCOVERED_OPENID_ISSUER', {name:cfg.name});
 
             let id_alg = cfg.id_token_alg || cfg.jwt_alg || 'PS256';
-            let user_alg = cfg.userinfo_token_alg || cfg.jwt_alg || 'PS256';
+            let user_alg = cfg.userinfo_token_alg || cfg.jwt_alg || '';
 
             // ID token alg supported
             let its = issuer.id_token_signing_alg_values_supported;
