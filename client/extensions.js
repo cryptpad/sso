@@ -247,7 +247,7 @@ define([
                             };
                         };
 
-                        $(form).append([urlLabel, issuerLabel, idpcLabel, spcLabel, pkLabel]);
+                        $(form).append([urlLabel, issuerLabel, idpcLabel, spcLabel, pkLabel, nameLabel]);
                     });
                     // OIDC
                     onChangeEvt.reg(type => {
