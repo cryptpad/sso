@@ -80,7 +80,7 @@ SSOUtils.writeRequest = (Env, data, cb) => {
 };
 
 SSOUtils.writeUser = (Env, provider, id, cb) => {
-    const seed = Nacl.util.encodeBase64(Nacl.randomBytes(24));
+    const seed = Util.encodeBase64(Nacl.randomBytes(24));
     SSO.user.write(Env, provider, id, JSON.stringify({
         seed: seed,
         password: false
