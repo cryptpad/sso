@@ -2,9 +2,7 @@ define([
     '/api/config',
     '/common/common-util.js',
     '/common/common-interface.js',
-    '/customize/messages.js',
-    '/customize/lucide.js',
-    '/common/common-icons.js'
+    '/customize/messages.js'
 ], function (ApiConfig, Util, UI, Messages) {
     return function (MyMessages) {
         const extensions = {};
