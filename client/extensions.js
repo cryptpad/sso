@@ -2,10 +2,15 @@ define([
     '/api/config',
     '/common/common-util.js',
     '/common/common-interface.js',
+    '/common/common-icons.js',
     '/customize/messages.js'
-], function (ApiConfig, Util, UI, Messages) {
+], function (ApiConfig, Util, UI, Icons, Messages) {
     return function (MyMessages) {
         const extensions = {};
+
+        Icons.add({
+            "sso": "id-card"
+        });
 
         extensions.ADMIN_CATEGORY = [{
             id: 'sso',
