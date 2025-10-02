@@ -10,8 +10,9 @@ module.exports = (SSOUtils) => {
             callbackUrl: opts.callbackURL,
             entryPoint: cfg.url,
             issuer: cfg.issuer,
-            cert: cfg.cert,
-            privateKey: cfg.privateKey
+            idpCert: cfg.cert,
+            privateKey: cfg.privateKey,
+            publicCert: cfg.signingCert
         });
         cb(void 0, saml);
     };
