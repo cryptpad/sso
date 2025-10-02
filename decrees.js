@@ -29,7 +29,7 @@ commands.ENFORCE_SSO = function (Env, args) {
 
     const enforce = !!args[0];
     const config = Env.sso;
-    if (config?.force === enforce) { return false; }
+    if (config?.enforced === enforce) { return false; }
     config.enforced = enforce;
     return true;
 };
