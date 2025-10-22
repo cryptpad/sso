@@ -2,15 +2,20 @@ define([
     '/api/config',
     '/common/common-util.js',
     '/common/common-interface.js',
+    '/common/common-icons.js',
     '/customize/messages.js'
-], function (ApiConfig, Util, UI, Messages) {
+], function (ApiConfig, Util, UI, Icons, Messages) {
     return function (MyMessages) {
         const extensions = {};
+
+        Icons.add({
+            "sso": "id-card"
+        });
 
         extensions.ADMIN_CATEGORY = [{
             id: 'sso',
             name: MyMessages.admin_category,
-            icon: 'fa fa-id-badge',
+            icon: 'sso',
             content: ['sso-enable','sso-config','sso-list']
         }];
         const getData = (sframeChan, cb) => {
@@ -322,8 +327,8 @@ define([
                         $(typeInput).find(`[value="${isEdit.type}"]`).prop('checked', true);
                     }
 
-                    const edit = blocks.button('primary', 'fa-pencil', Messages.tag_edit);
-                    const remove = blocks.button('danger', 'fa-trash', Messages.fc_remove);
+                    const edit = blocks.button('primary', 'edit', Messages.tag_edit);
+                    const remove = blocks.button('danger', 'trash-full', Messages.fc_remove);
                     const $edit = $(edit), $remove = $(remove);
                     Util.onClickEnter($edit, () => {
                         $edit.prop('disabled', 'disabled');
@@ -335,7 +340,7 @@ define([
                                 value: v
                             }]
                         }, function (e, response) {
-                            $edit.prop('disabled', false);;
+                            $edit.prop('disabled', false);
                             if (e || response.error) {
                                 UI.warn(Messages.error);
                                 console.error(e, response);
@@ -399,7 +404,7 @@ define([
 
                 // ID
                 const newInput = blocks.input();
-                const newButton = blocks.button('primary', 'fa-plus', Messages.tag_add);
+                const newButton = blocks.button('primary', 'add', Messages.tag_add);
                 const newMerge = blocks.inputButton(newInput, newButton, {onEnterDelegate:true});
                 const newLabel = blocks.labelledInput(MyMessages.provider_new, newMerge);
 

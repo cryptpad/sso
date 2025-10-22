@@ -120,7 +120,7 @@ module.exports = {
         issuer: 'your-cryptpad-issuer-id',
         cert: String or fs.readFileSync("./your/cert/location", "utf-8"),
         privateKey: fs.readFileSync("./your/private/key/location", "utf-8"),
-        publicCert: fs.readFileSync("./your/signing/cert/location", "utf-8"),
+        signingCert: fs.readFileSync("./your/signing/cert/location", "utf-8"),
     }
     */
     ]
