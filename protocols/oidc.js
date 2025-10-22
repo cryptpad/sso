@@ -54,7 +54,7 @@ module.exports = (SSOUtils) => {
                 let extra_scope = cfg.extra_scope || ''; // This is not yet used
 
                 let config = {
-                    scope: `openid ${username_scope} ${email_scope} ${extra_scope}`,
+                    scope: `openid ${username_scope} ${email_scope} ${extra_scope}`.trim(),
                     //resource: opts.callbackURL,
                     //access_type: 'offline',
                     state: Math.random().toString(36), // Just create a state for providers that require it...
