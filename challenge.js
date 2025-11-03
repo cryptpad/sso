@@ -1,18 +1,19 @@
-const Util = require("../../common-util");
-const Commands = module.exports;
+const Commands = {};
 const SSOUtils = require('./sso-utils');
 const nThen = require("nthen");
-const BlockStore = require("../../storage/block");
-const Block = require("../../commands/block");
 
 const TYPES = SSOUtils.TYPES;
 const checkConfig = SSOUtils.checkConfig;
 const getProviderConfig = SSOUtils.getProviderConfig;
 const isValidConfig = SSOUtils.isValidConfig;
 
+let Util = {};
+const setModules = (Env) => {
+    Util = Env.modules.Util;
+};
 
 // Create an SSO authentication request
-const auth = Commands.SSO_AUTH = function (Env, body, cb) {
+const auth = Commands.SSO_AUTH = (Env, body, cb) => {
     if (!checkConfig(Env)) { return void cb('INVALID_SERVER_CONFIG'); }
     const { provider } = body;
     const cfg = getProviderConfig(Env, provider);
@@ -21,11 +22,12 @@ const auth = Commands.SSO_AUTH = function (Env, body, cb) {
 
     cb();
 };
-auth.complete = function (Env, body, cb, req, res) {
+auth.complete = (Env, body, cb) => {
     // If we're here it means a valid provider was given. We can start the authentication process
     const { provider, register, publicKey } = body;
     const cfg = getProviderConfig(Env, provider);
     const idp = TYPES[cfg.type.toLowerCase()];
+
     idp.auth(Env, cfg, (err, obj) => {
         if (err) { return void cb(err); } // TODO log
 
@@ -43,21 +45,26 @@ auth.complete = function (Env, body, cb, req, res) {
             publicKey: publicKey,
             register: Boolean(register)
         }, (err) => {
-            if (err) { return void cb("E_REQ_WRITE"); }
+            if (err) {
+                Env.Log.warn(err);
+                return void cb("E_REQ_WRITE");
+            }
 
             let value = `ssotoken="${token}"; SameSite=Strict; HttpOnly`;
-            res.setHeader('Set-Cookie', value);
-            cb(void 0, {url: url});
+            cb(void 0, {
+                url: url,
+                '_cookie': value
+            });
         });
     });
 };
 
 // Receive authentication data from the IdP.
 // Read the auth request, create a JWT and get a block seed for this SSO user.
-const authCb = Commands.SSO_AUTH_CB = function (Env, body, cb, req) {
+const authCb = Commands.SSO_AUTH_CB = (Env, body, cb) => {
     if (!checkConfig(Env)) { return void cb('INVALID_SERVER_CONFIG'); }
     const { publicKey } = body;
-    const cookies = req.cookies;
+    const cookies = body._cookies;
     const ssotoken = cookies.ssotoken;
     if (!ssotoken) { return void cb('NO_COOKIE'); }
     SSOUtils.readRequest(Env, ssotoken, (err, value) => {
@@ -68,11 +75,11 @@ const authCb = Commands.SSO_AUTH_CB = function (Env, body, cb, req) {
         cb();
     });
 };
-authCb.complete = function (Env, body, cb, req) {
+authCb.complete = (Env, body, cb) => {
     // If we're here it means a valid cookie was given. We can continue the authentication
     const { url } = body;
-    const cookies = req.cookies;
-    const ssotoken = cookies.ssotoken;
+    const cookies = body._cookies;
+    const ssotoken = cookies?.ssotoken;
     if (!ssotoken) { return void cb('NO_COOKIE'); }
     SSOUtils.readRequest(Env, ssotoken, (err, value) => {
         SSOUtils.deleteRequest(Env, ssotoken);
@@ -127,9 +134,10 @@ authCb.complete = function (Env, body, cb, req) {
     });
 };
 
-// XXX write block change-password? should be the same as otp but without otp code
-const register = Commands.SSO_WRITE_BLOCK = function (Env, body, cb) {
+const register = Commands.SSO_WRITE_BLOCK = (Env, body, cb) => {
     const { publicKey, content } = body;
+    const Block = Env?.modules?.Block;
+    const BlockStore = Env?.modules?.BlockStore;
 
     // they must provide a valid block public key
     if (!Block.isValidBlockId(publicKey)) { return void cb("INVALID_KEY"); }
@@ -137,9 +145,9 @@ const register = Commands.SSO_WRITE_BLOCK = function (Env, body, cb) {
     const jwt = content.auth;
     if (!jwt) { return void cb('NO_JWT'); }
 
-    BlockStore.isAvailable(Env, publicKey, (err, result) => {
-        if (err || result) {
-            return void cb(err || 'EEXISTS');
+    BlockStore.check(Env, publicKey, (err) => {
+        if (err?.code !== 'ENOENT') {
+            return void cb(err.code || 'EEXISTS');
         }
         // No block at this location: continue
         cb();
@@ -147,12 +155,14 @@ const register = Commands.SSO_WRITE_BLOCK = function (Env, body, cb) {
 };
 register.complete = function (Env, body, cb) {
     const { publicKey, content } = body;
+    const Block = Env?.modules?.Block;
+
     const jwt = content.auth;
     const pw = content.hasPassword;
     content.isSSO = true;
+
     let payload;
     let ssoUser;
-    // XXX UPDATE sso_user add password boolean
     nThen((w) => {
         SSOUtils.checkJWT(Env, jwt, w((err, _payload) => {
             if (err) {
@@ -202,13 +212,15 @@ register.complete = function (Env, body, cb) {
 
 const login = Commands.SSO_VALIDATE = function (Env, body, cb) {
     const { publicKey, jwt } = body;
+    const Block = Env?.modules?.Block;
+    const BlockStore = Env?.modules?.BlockStore;
 
     // they must provide a valid block public key
     if (!Block.isValidBlockId(publicKey)) { return void cb("INVALID_KEY"); }
     if (!jwt) { return void cb('NO_JWT'); }
 
-    BlockStore.isAvailable(Env, publicKey, (err, result) => {
-        if (err && !result) { return void cb(err); }
+    BlockStore.check(Env, publicKey, (err) => {
+        if (err) { return void cb(err?.code || 'ERROR'); }
         // Block found
         cb();
     });
@@ -252,15 +264,18 @@ login.complete = function (Env, body, cb) {
 const update = Commands.SSO_UPDATE_BLOCK = function (Env, body, cb) {
     const { publicKey, ancestorProof } = body;
 
+    const BlockStore = Env?.modules?.BlockStore;
+    const Block = Env?.modules?.Block;
+
     // they must provide a valid block public key
     if (!Block.isValidBlockId(publicKey)) { return void cb("INVALID_KEY"); }
 
     let oldKey;
     nThen((w) => {
-        BlockStore.isAvailable(Env, publicKey, w((err, result) => {
-            if (err && !result) {
+        BlockStore.check(Env, publicKey, w((err) => {
+            if (err) {
                 w.abort();
-                return void cb(err);
+                return void cb(err?.code || 'ERROR');
             }
             // Block found: next
         }));
@@ -312,4 +327,9 @@ update.complete = function (Env, body, cb) {
     }).nThen(() => {
         cb();
     });
+};
+
+module.exports = {
+    setModules,
+    Commands
 };

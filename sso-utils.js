@@ -1,21 +1,22 @@
-const SSO = require("../../storage/sso");
-const Sessions = require("../../storage/sessions");
+const SSO = require("./storage");
 const Nacl  = require("tweetnacl/nacl-fast");
 const JWT = require("jsonwebtoken");
-const Util = require("../../common-util");
-const config = require("../../load-config");
 const nThen = require("nthen");
 const fs = require('node:fs');
 
 const SSOUtils = module.exports;
 
-const SESSION_EXPIRATIION = 12 * 3600 * 1000; // XXX Hours? Days? Weeks? Configurable?
+let Util = {};
+SSOUtils.setModules = (Env) => {
+    Util = Env.modules.Util;
+    SSO._setModules(Env);
+};
 
+const SESSION_EXPIRATIION = 12 * 3600 * 1000; // FIXME Hours? Days? Weeks? Configurable?
 
-
-SSOUtils.getOptions = () => {
+SSOUtils.getOptions = (Env) => {
     return {
-        callbackURL: config.httpUnsafeOrigin + '/ssoauth'
+        callbackURL: Env.httpUnsafeOrigin + '/ssoauth'
     };
 };
 
@@ -50,20 +51,34 @@ SSOUtils.isValidConfig = (cfg) => {
     return idp.checkConfig(cfg);
 };
 
-SSOUtils.deleteRequest = (Env, id) => {
+SSOUtils.deleteRequest = (Env, id, cb, noRedirect) => {
+    if (!noRedirect && !Env.Core.checkStorage(Env, id, 'SSO_CMD', {
+        cmd: 'DELETE_REQUEST', id
+    }, () => {})) { return; }
+
     SSO.request.delete(Env, id, (err) => {
+        if (typeof(cb) === "function") { cb(); }
         if (!err) { return; }
-        console.log(`Failed to delete SSO request ${id}`);
-        // XXX log?
+        Env.Log.warn(`SSO: Failed to delete SSO request ${id}`);
     });
 };
 
-SSOUtils.readRequest = (Env, id, cb) => {
+SSOUtils.readRequest = (Env, id, cb, noRedirect) => {
+    if (!noRedirect && !Env.Core.checkStorage(Env, id, 'SSO_CMD', {
+        cmd: 'READ_REQUEST', id
+    }, cb)) { return; }
+
     SSO.request.read(Env, id, cb);
 };
 
-SSOUtils.writeRequest = (Env, data, cb) => {
+SSOUtils.writeRequest = (Env, data, cb, noRedirect) => {
     if (!data || !data.id || !data.type) { return void cb ('INVALID_REQUEST'); }
+
+    if (!noRedirect && !Env.Core.checkStorage(Env, data.id, 'SSO_CMD', {
+        cmd: 'WRITE_REQUEST',
+        data
+    }, cb)) { return; }
+
     const id = data.id;
     const value = {
         type: data.type,
@@ -79,7 +94,11 @@ SSOUtils.writeRequest = (Env, data, cb) => {
     SSO.request.write(Env, id, JSON.stringify(value), cb);
 };
 
-SSOUtils.writeUser = (Env, provider, id, cb) => {
+SSOUtils.writeUser = (Env, provider, id, cb, noRedirect) => {
+    if (!noRedirect && !Env.Core.checkStorage(Env, provider+id, 'SSO_CMD', {
+        cmd: 'WRITE_USER', provider, id
+    }, cb)) { return; }
+
     const seed = Util.encodeBase64(Nacl.randomBytes(24));
     SSO.user.write(Env, provider, id, JSON.stringify({
         seed: seed,
@@ -90,18 +109,30 @@ SSOUtils.writeUser = (Env, provider, id, cb) => {
     });
 };
 
-SSOUtils.readUser = (Env, provider, id, cb) => {
+SSOUtils.readUser = (Env, provider, id, cb, noRedirect) => {
+    if (!noRedirect && !Env.Core.checkStorage(Env, provider+id, 'SSO_CMD', {
+        cmd: 'READ_USER', provider, id
+    }, cb)) { return; }
+
     SSO.user.read(Env, provider, id, (err, user) => {
         if (err) { return void cb(err); }
         cb(void 0, Util.tryParse(user));
     });
 };
 
-SSOUtils.deleteUser = (Env, provider, id, cb) => {
+SSOUtils.deleteUser = (Env, provider, id, cb, noRedirect) => {
+    if (!noRedirect && !Env.Core.checkStorage(Env, provider+id, 'SSO_CMD', {
+        cmd: 'DELETE_USER', provider, id
+    }, cb)) { return; }
+
     SSO.user.archive(Env, provider, id, cb);
 };
 
-SSOUtils.updateUser = (Env, provider, id, data, cb) => {
+SSOUtils.updateUser = (Env, provider, id, data, cb, noRedirect) => {
+    if (!noRedirect && !Env.Core.checkStorage(Env, provider+id, 'SSO_CMD', {
+        cmd: 'UPDATE_USER', provider, id, data
+    }, cb)) { return; }
+
     SSO.user.archive(Env, provider, id, () => {
         SSO.user.write(Env, provider, id, JSON.stringify(data), (err) => {
             if (err) { return void cb(err); }
@@ -120,7 +151,11 @@ SSOUtils.writeBlock = (Env, id, provider, ssoID, cb) => {
     });
 };
 
-SSOUtils.readBlock = (Env, id, cb) => {
+SSOUtils.readBlock = (Env, id, cb, noRedirect) => {
+    if (!noRedirect && !Env.Core.checkStorage(Env, id, 'SSO_CMD', {
+        cmd: 'READ_BLOCK', id
+    }, cb)) { return; }
+
     SSO.block.read(Env, id, (err, blockData) => {
         if (err && err !== 'ENOENT' && err.code !== 'ENOENT') {
             Env.Log.error("SSO_READ_BLOCK", {
@@ -219,6 +254,7 @@ SSOUtils.checkJWT = (Env, token, cb) => {
 };
 
 SSOUtils.makeSession = (Env, publicKey, provider, ssoData, cb) => {
+    const Sessions = Env.modules.Sessions;
     const sessionId = Sessions.randomId();
     Sessions.write(Env, publicKey, sessionId, JSON.stringify({
         sso: {

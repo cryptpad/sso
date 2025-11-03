@@ -1,15 +1,14 @@
-const DecreesCore = require('../../decrees-core');
-const DECREE_NAME = 'sso.ndjson';
-
 const commands = {};
 
-const {
-    args_isBoolean,
-    args_isInteger,
-    /*args_isString,
-    args_isPositiveInteger*/
-} = DecreesCore.Utils;
-
+const args_isBoolean = (args) => {
+    return !(!Array.isArray(args) || typeof(args[0]) !== 'boolean');
+};
+const isInteger = (n) => {
+    return !(typeof(n) !== 'number' || isNaN(n) || (n % 1) !== 0);
+};
+const args_isInteger = (args) => {
+    return !(!Array.isArray(args) || !isInteger(args[0]));
+};
 
 commands.ENABLE_SSO = function (Env, args) {
     if (!args_isBoolean(args)) {
@@ -85,7 +84,7 @@ commands.UPDATE_PROVIDER = function (Env, args) {
     // Add provider
     if (!exists) {
         // Make sure id doesn't contain invalid characters
-        if (/[^a-zA-Z-_ ]+/.test(id)) {
+        if (/[^a-zA-Z-_ 0-9]+/.test(id)) {
             throw new Error("INVALID_ARGS");
         }
         config.list.push(value);
@@ -99,4 +98,4 @@ commands.UPDATE_PROVIDER = function (Env, args) {
 };
 
 
-module.exports = DecreesCore.create(DECREE_NAME, commands);
+module.exports = commands;

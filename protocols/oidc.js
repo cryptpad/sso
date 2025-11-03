@@ -3,12 +3,13 @@ const OID = require('openid-client');
 const TYPE = 'oidc';
 
 module.exports = (SSOUtils) => {
-    const opts = SSOUtils.getOptions();
     let clients = {};
     const getClient = (Env, cfg, cb) => {
         if (clients[cfg.name]) {
             return void cb(void 0, clients[cfg.name]);
         }
+
+        const opts = SSOUtils.getOptions(Env);
 
         Env.Log.verbose('DISCOVER_OPENID_ISSUER', {name:cfg.name, url:cfg.url});
         OID.Issuer.discover(cfg.url).then((issuer) => {
@@ -91,6 +92,8 @@ module.exports = (SSOUtils) => {
                     return void cb ('E_OIDC_CONNECT');
                 }
                 Env.Log.verbose('OPENID_AUTHCB');
+
+                const opts = SSOUtils.getOptions(Env);
 
                 const token = tokens.code;
                 const nonce = tokens.nonce;
