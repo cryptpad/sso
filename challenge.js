@@ -136,11 +136,11 @@ authCb.complete = (Env, body, cb) => {
 
 const register = Commands.SSO_WRITE_BLOCK = (Env, body, cb) => {
     const { publicKey, content } = body;
-    const Block = Env?.modules?.Block;
+    const Core = Env?.modules?.Core;
     const BlockStore = Env?.modules?.BlockStore;
 
     // they must provide a valid block public key
-    if (!Block.isValidBlockId(publicKey)) { return void cb("INVALID_KEY"); }
+    if (!Core.isValidBlockId(publicKey)) { return void cb("INVALID_KEY"); }
     if (publicKey !== content.publicKey) { return void cb("INVALID_KEY"); }
     const jwt = content.auth;
     if (!jwt) { return void cb('NO_JWT'); }
@@ -212,11 +212,11 @@ register.complete = function (Env, body, cb) {
 
 const login = Commands.SSO_VALIDATE = function (Env, body, cb) {
     const { publicKey, jwt } = body;
-    const Block = Env?.modules?.Block;
+    const Core = Env?.modules?.Core;
     const BlockStore = Env?.modules?.BlockStore;
 
     // they must provide a valid block public key
-    if (!Block.isValidBlockId(publicKey)) { return void cb("INVALID_KEY"); }
+    if (!Core.isValidBlockId(publicKey)) { return void cb("INVALID_KEY"); }
     if (!jwt) { return void cb('NO_JWT'); }
 
     BlockStore.check(Env, publicKey, (err) => {
@@ -266,9 +266,10 @@ const update = Commands.SSO_UPDATE_BLOCK = function (Env, body, cb) {
 
     const BlockStore = Env?.modules?.BlockStore;
     const Block = Env?.modules?.Block;
+    const Core = Env?.modules?.Core;
 
     // they must provide a valid block public key
-    if (!Block.isValidBlockId(publicKey)) { return void cb("INVALID_KEY"); }
+    if (!Core.isValidBlockId(publicKey)) { return void cb("INVALID_KEY"); }
 
     let oldKey;
     nThen((w) => {

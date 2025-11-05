@@ -22,10 +22,7 @@ SSO.config = config;
 
 SSO.challenges = Object.keys(Challenge.Commands);
 
-SSO.addAdminCommands = (/*Env*/) => {
-    const commands = {};
-
-    // XXX TODO CHECK: send to storage:0
+SSO.addAdminCommands = (Env, commands) => {
     commands.ADD_SSO_DECREE = (Env, unsafeKey, data, cb) => {
         Env.Log.verbose('SSO_ADMIN_DECREE_RECEIVED', data);
 
@@ -36,7 +33,7 @@ SSO.addAdminCommands = (/*Env*/) => {
 
         const decree = [command, args, unsafeKey, +new Date()];
         // Send to storage:0
-        Env.interface.sendQuery('storage:0', 'ADMIN_DECREE', decree, response => {
+        Env.interface.sendQuery('storage:0', 'SSO_DECREE', decree, response => {
             cb(response.error, response.data);
             if (response.error) { return; }
             Env.Log.info('SSO_ADMIN_DECREE', decree);
@@ -45,19 +42,6 @@ SSO.addAdminCommands = (/*Env*/) => {
     commands.LIST_SSO = (Env, unsafeKey, data, cb) => {
         cb(void 0, Env.sso);
     };
-
-    return commands;
-};
-
-SSO.initialize = (Env, type) => {
-    // XXX flushCache enough to propagate to http-worker?
-    if (type !== "main") { return; }
-    SSODecrees.load(Env, err => {
-        Env.flushCache();
-        if (err) {
-            return Env.Log?.error('ERROR_LOADING_SSO_DECREE', err);
-        }
-    });
 };
 
 SSO.addStorageCommands = (Env, commands) => {
@@ -107,6 +91,12 @@ SSO.addStorageCommands = (Env, commands) => {
             return void SSO.utils.readBlock(Env, args.id, cb, true);
         }
     };
+
+    commands.SSO_DECREE = (decree, cb) => {
+        if (Env.myId !== "storage:0") { return void cb('EINVAL'); }
+        console.log(decree);
+        Env.modules?.Decrees?.onNewDecree(Env, decree, PLUGIN_NAME, cb);
+    };
 };
 
 SSO.initStorage = (Env, waitFor) => {
@@ -116,7 +106,6 @@ SSO.initStorage = (Env, waitFor) => {
             Env.sendDecrees(toSend, PLUGIN_NAME);
         }));
     }
-
 };
 
 const addStorageEndpoint = (Env, app) => {

@@ -81,6 +81,11 @@ commands.UPDATE_PROVIDER = function (Env, args) {
         throw new Error("INVALID_ARGS");
     }
 
+    // Remove empty string parameters (create issues with node-saml)
+    Object.keys(value).forEach(key => {
+        if (!value[key]) { delete value[key]; }
+    });
+
     // Add provider
     if (!exists) {
         // Make sure id doesn't contain invalid characters
