@@ -94,7 +94,6 @@ SSO.addStorageCommands = (Env, commands) => {
 
     commands.SSO_DECREE = (decree, cb) => {
         if (Env.myId !== "storage:0") { return void cb('EINVAL'); }
-        console.log(decree);
         Env.modules?.Decrees?.onNewDecree(Env, decree, PLUGIN_NAME, cb);
     };
 };
