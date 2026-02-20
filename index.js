@@ -49,7 +49,7 @@ SSO.addStorageCommands = (Env, commands) => {
     SSO.challenges.forEach(cmd => {
         const f = Challenge.Commands[cmd];
         if (typeof(f) !== "function" || !f.complete) {
-            return void cb('EINVAL');
+            return;
         }
         commands[cmd] = (args, cb) => {
             return f(Env, args, cb);
@@ -123,7 +123,7 @@ const addStorageEndpoint = (Env, app) => {
                 content: smres
             }, (err) => {
                 if (err) {
-                    Log.error('E_SSO_WRITE_REQ', err);
+                    Env.Log.error('E_SSO_WRITE_REQ', err);
                     return res.sendStatus(500);
                 }
                 let value = `samltoken="${token}"; SameSite=Strict; HttpOnly`;
