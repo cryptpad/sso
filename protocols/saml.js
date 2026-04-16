@@ -49,7 +49,7 @@ module.exports = (SSOUtils) => {
                 const nameRef = cfg.username_attr || 'displayName' || 'urn:oid:2.16.840.1.113730.3.1.241';
 
                 getClient(Env, cfg, (err, client) => {
-                    if (err) { return void cb ('E_OIDC_CONNECT'); }
+                    if (err) { return void cb ('E_SAML_CONNECT'); }
                     client.validatePostResponseAsync({
                         SAMLResponse: data.content
                     }).then((data) => {
@@ -61,6 +61,9 @@ module.exports = (SSOUtils) => {
                             name: data.profile[nameRef] || data.profile.nameID,
                             idpData: {}
                         });
+                    }).catch(err => {
+                        Env.Log.error('ERROR_SAML_CALLBACK', err);
+                        return void cb('EINVAL');
                     });
                 });
             });

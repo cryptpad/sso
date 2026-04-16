@@ -135,11 +135,14 @@ module.exports = (SSOUtils) => {
                         name = data[username_claim];
                         end();
                         Env.Log.debug('OPENID_USERINFO', data);
-                    }, (err) => {
+                    }).catch((err) => {
                         Env.Log.error('ERROR_OPENID_USERINFO', err);
                         name = 'Unknown'; // XXX
                         end();
                     });
+                }).catch(err => {
+                    Env.Log.error('ERROR_OPENID_CALLBACK', err);
+                    cb(err);
                 });
             });
         },
