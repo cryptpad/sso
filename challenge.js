@@ -239,11 +239,15 @@ login.complete = function (Env, body, cb) {
         }));
     }).nThen((w) => {
         const { sub, provider } = payload;
-        SSOUtils.readUser(Env, provider, sub, w((err) => {
+        SSOUtils.readUser(Env, provider, sub, w((err, userData) => {
             if (err) {
                 w.abort();
                 console.log(err, sub);
                 return void cb('SSO_NO_USER');
+            }
+            if (userData?.block !== publicKey) {
+                w.abort();
+                return void cb('SSO_INVALID_BLOCK');
             }
         }));
     }).nThen((w) => {
