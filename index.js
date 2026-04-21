@@ -126,7 +126,7 @@ const addStorageEndpoint = (Env, app) => {
                     Env.Log.error('E_SSO_WRITE_REQ', err);
                     return res.sendStatus(500);
                 }
-                let value = `samltoken="${token}"; SameSite=Strict; HttpOnly`;
+                let value = `samltoken="${token}"; SameSite=Strict; HttpOnly; Path=/; Secure`;
                 res.setHeader('Set-Cookie', value);
                 next();
             });
