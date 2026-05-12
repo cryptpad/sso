@@ -8,7 +8,7 @@
     "config_enforced":"Require SSO to log in?",
     "config_enforced_all":"No, all users can log in",
     "config_enforced_sso":"Yes, only SSO users can log in",
-    "config_password":"User accounts can also have their own passwords in addition to SSO. Without account passwords, administrators of the SSO provider have access to user data. Use CryptPad account password?",
+    "config_password":"User accounts can also have their own passwords in addition to SSO. Without account passwords, the SSO manager or the hoster of the CryptPad instance could gain access to the user data. Use CryptPad account password?",
     "config_password_no":"No password",
     "config_password_yes":"Allow password",
     "config_password_force":"Force password",

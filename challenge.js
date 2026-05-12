@@ -283,12 +283,13 @@ const update = Commands.SSO_UPDATE_BLOCK = function (Env, body, cb) {
     });
 };
 update.complete = function (Env, body, cb) {
-    const { publicKey, ancestorProof } = body;
+    const { publicKey, ancestorProof, hasPassword } = body;
 
     // We've already proven that the "proof" is valid so we can extract its key
     const proof = Util.tryParse(ancestorProof);
     const oldKey = proof && proof[0];
 
+    let ssoUser;
     let oldBlock;
     nThen((w) => {
         SSOUtils.readBlock(Env, oldKey, w((err, data) => {
@@ -309,6 +310,19 @@ update.complete = function (Env, body, cb) {
                 return void cb('SSO_UPDATE_BLOCK_WRITE');
             }
         }));
+    }).nThen((w) => {
+        SSOUtils.readUser(Env, oldBlock.provider, oldBlock.id, w((err, user) => {
+            if (err) {
+                w.abort();
+                console.log(err, oldBlock.id);
+                return void cb('SSO_NO_USER');
+            }
+            ssoUser = user;
+        }));
+    }).nThen((w) => {
+        ssoUser.password = Boolean(hasPassword);
+        ssoUser.block = publicKey;
+        SSOUtils.updateUser(Env, oldBlock.provider, oldBlock.id, ssoUser, w());
     }).nThen(() => {
         cb();
     });
