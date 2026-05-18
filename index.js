@@ -10,12 +10,12 @@ const SSO = {};
 const DECREE_NAME = 'sso.ndjson';
 
 let config = {};
+const cfgPath = process.env.CRYPTPAD_SSO_CONFIG || "../../config/sso";
 try {
-    config = require("../../config/sso");
+    config = require(cfgPath);
 } catch (e) {
     //console.log("SSO config not found");
 }
-
 
 SSO.utils = require('./sso-utils');
 SSO.config = config;
