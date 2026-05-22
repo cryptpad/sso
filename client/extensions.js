@@ -12,6 +12,8 @@ define([
             "sso": "id-card"
         });
 
+        const onStateEvt = Util.mkEvent();
+
         extensions.ADMIN_CATEGORY = [{
             id: 'sso',
             name: MyMessages.admin_category,
@@ -32,7 +34,6 @@ define([
             });
         };
 
-        const onStateEvt = Util.mkEvent();
         extensions.ADMIN_ITEM = [{
             id: 'sso-enable',
             title: MyMessages.enable_global,
@@ -89,6 +90,18 @@ define([
 
                     const getState = () => String(Boolean(APP.instanceConfig?.sso?.force));
                     const cmd = 'ENFORCE_SSO';
+
+                    const update = ($input) => {
+                        APP.updateStatus(function () {
+                            if (APP.instanceConfig?.sso === false) {
+                                $input.prop('checked', false);
+                                return;
+                            }
+                            let state = getState();
+                            $input.filter(`[value="${state}"]`).prop('checked', true);
+                        });
+                    };
+
                     const radio = blocks.radio(key, getState(), {
                         values: { 'false': labelAll, 'true': labelSSO },
                         spinner: true
@@ -108,13 +121,16 @@ define([
                                 radio.spinner.done();
                             }
                             $input.prop('disabled', false);
-                            APP.updateStatus(function () {
-                                let state = getState();
-                                console.error(state, $input, $input.filter(`[value="${state}"]`));
-                                $input.filter(`[value="${state}"]`).prop('checked', true);
-                            });
+                            update($input);
                         });
                     });
+
+                    let $input = $(radio).find('input');
+                    onStateEvt.reg(state => {
+                        update($input);
+                    });
+                    update($input);
+
 
                     return blocks.hintItem(hint, radio);
                 };
@@ -129,6 +145,16 @@ define([
                     const getState = () => String(APP.instanceConfig?.sso?.password || 0);
                     const cmd = 'PASSWORD_SSO';
 
+                    const update = (input) => {
+                        APP.updateStatus(function () {
+                            if (APP.instanceConfig?.sso === false) {
+                                $input.prop('checked', false);
+                                return;
+                            }
+                            let state = getState();
+                            $input.filter(`[value="${state}"]`).prop('checked', true);
+                        });
+                    };
                     const radio = blocks.radio(key, getState(), {
                         values: { '0':labelNo, '1':labelYes, '2':labelForce },
                         spinner: true
@@ -148,12 +174,14 @@ define([
                                 radio.spinner.done();
                             }
                             $input.prop('disabled', false);
-                            APP.updateStatus(function () {
-                                let state = getState();
-                                $input.find(`[value="${state}"]`).prop('checked', state);
-                            });
+                            update($input);
                         });
                     });
+                    let $input = $(radio).find('input');
+                    onStateEvt.reg(state => {
+                        update($input);
+                    });
+                    update($input);
                     return blocks.hintItem(hint, radio);
                 };
 
