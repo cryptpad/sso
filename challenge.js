@@ -46,6 +46,9 @@ auth.complete = function (Env, body, cb, req, res) {
             if (err) { return void cb("E_REQ_WRITE"); }
 
             let value = `ssotoken="${token}"; SameSite=Strict; HttpOnly`;
+            if (Env?.sso?.allowEmbed) {
+                value = `ssotoken="${token}"; SameSite=None; Secure; HttpOnly`;
+            }
             res.setHeader('Set-Cookie', value);
             cb(void 0, {url: url});
         });

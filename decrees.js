@@ -97,6 +97,17 @@ commands.UPDATE_PROVIDER = function (Env, args) {
 
     return true;
 };
+commands.SSO_EMBEDDED = function (Env, args) {
+    if (!args_isBoolean(args)) {
+        throw new Error("INVALID_ARGS");
+    }
+
+    const allowEmbed = !!args[0];
+    const config = Env.sso;
+    if (config?.allowEmbed === allowEmbed) { return false; }
+    config.allowEmbed = allowEmbed;
+    return true;
+};
 
 
 module.exports = DecreesCore.create(DECREE_NAME, commands);
