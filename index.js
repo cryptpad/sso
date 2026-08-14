@@ -134,7 +134,7 @@ const addStorageEndpoint = (Env, app) => {
         }
         next();
     });
-    let ssoauth = Path.join(__dirname, '../..', Env.clientRoot, 'www', 'ssoauth');
+    let ssoauth = Path.join(Env.clientRoot, 'www', 'ssoauth');
     app.use('/ssoauth', Express.static(ssoauth));
 };
 
