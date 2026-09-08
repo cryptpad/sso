@@ -13,7 +13,8 @@ module.exports = (SSOUtils) => {
             idpCert: cfg.cert,
             privateKey: cfg.privateKey,
             publicCert: cfg.signingCert,
-            disableRequestedAuthnContext: cfg.disableRequestedAuthnContext
+            disableRequestedAuthnContext: cfg.disableRequestedAuthnContext,
+            wantAuthnResponseSigned: cfg.wantAuthnResponseSigned
         });
         cb(void 0, saml);
     };
