@@ -12,7 +12,8 @@ module.exports = (SSOUtils) => {
             issuer: cfg.issuer,
             idpCert: cfg.cert,
             privateKey: cfg.privateKey,
-            publicCert: cfg.signingCert
+            publicCert: cfg.signingCert,
+            disableRequestedAuthnContext: cfg.disableRequestedAuthnContext
         });
         cb(void 0, saml);
     };
@@ -61,7 +62,7 @@ module.exports = (SSOUtils) => {
                             idpData: {}
                         });
                     }).catch(err => {
-                        Env.Log.error('ERROR_SAML_CALLBACK', err);
+                        Env.Log.error('ERROR_SAML_CALLBACK', Util.serializeError(err));
                         return void cb('EINVAL');
                     });
                 });
