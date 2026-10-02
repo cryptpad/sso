@@ -10,7 +10,7 @@ const SSO = {};
 const DECREE_NAME = 'sso.ndjson';
 
 let config = {};
-const cfgPath = process.env.CRYPTPAD_SSO_CONFIG || "../../config/sso";
+const cfgPath = process.env.CRYPTPAD_SSO_CONFIG || "../../../config/sso";
 try {
     config = require(cfgPath);
 } catch (e) {
@@ -161,7 +161,7 @@ SSO.customizeEnv = (Env) => {
     Challenge.setModules(Env);
     SSO.utils.setModules(Env);
 
-    Env.sso ||= {}; // XXX use initial config static file
+    Env.sso ||= config;
     Env.ssoDecrees = DecreesCore.create(DECREE_NAME, SSODecrees);
 };
 
