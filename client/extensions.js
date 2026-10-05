@@ -126,7 +126,7 @@ define([
                     });
 
                     let $input = $(radio).find('input');
-                    onStateEvt.reg(state => {
+                    onStateEvt.reg(() => {
                         update($input);
                     });
                     update($input);
@@ -145,7 +145,7 @@ define([
                     const getState = () => String(APP.instanceConfig?.sso?.password || 0);
                     const cmd = 'PASSWORD_SSO';
 
-                    const update = (input) => {
+                    const update = ($input) => {
                         APP.updateStatus(function () {
                             if (APP.instanceConfig?.sso === false) {
                                 $input.prop('checked', false);
@@ -178,7 +178,7 @@ define([
                         });
                     });
                     let $input = $(radio).find('input');
-                    onStateEvt.reg(state => {
+                    onStateEvt.reg(() => {
                         update($input);
                     });
                     update($input);
