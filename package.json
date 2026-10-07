@@ -1,7 +1,7 @@
 {
   "name": "cryptpad-sso-plugin",
   "description": "SSO plugin for CryptPad",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "license": "AGPL-3.0+",
   "dependencies": {
     "@node-saml/node-saml": "^5.1.0",
