@@ -21,13 +21,13 @@ Users will still be able to create a personal password which will be used to der
 - Allow synchronizing OIDC roles/groups with CryptPad teams;
 - Additional SSO protocols.
 
-If you are interested in these extra features and wish to sponsor them, contact XWiki SAS at sales@cryptpad.org
+If you are interested in these extra features and wish to sponsor them, contact XWiki SAS at <sales@cryptpad.org>
 
 ## Manual installation
 
 1. Go the cryptpad/lib/plugins directory on your server
 
-```
+```shell
 cd cryptpad/lib/plugins
 git clone https://github.com/cryptpad/sso/
 npm ci
@@ -50,42 +50,42 @@ When setting up the client credentials on your OpenIDC Connect server the follow
 
 Here follows an example configuration file for `sso.js` showing examples for KeyCloak, Univention UCS and SAML:
 
-```
+```javascript
 // SPDX-FileCopyrightText: 2023 XWiki CryptPad Team <contact@cryptpad.org> and contributors
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 //const fs = require('node:fs');
 module.exports = {
-    // Enable SSO login on this instance
-    enabled: true,
-    // Block registration for non-SSO users on this instance
-    enforced: false,
-    // Allow users to add an additional CryptPad password to their SSO account
-    cpPassword: true,
-    // You can also force your SSO users to add a CryptPad password
-    forceCpPassword: true,
-    // List of SSO providers
-    list: [
-      {
-        name: 'keycloak',
-        type: 'oidc',
-        url: 'https://<keycloakserver/realms/<realm>',
-        client_id: "cryptpad",
-        client_secret: "<clientsecret>",
-        jwt_alg: 'RS256', (deprecated)
-        id_token_alg: 'PS256', (optional)
-        userinfo_token_alg: 'PS256', (optional)
-        username_scope: 'profile',  (optional)
-        username_claim: 'name', (optional)
-        use_pkce: true, (optional)
-        use_nonce: true (optional)
-      },
-    /*
+        // Enable SSO login on this instance
+        enabled: true,
+        // Block registration for non-SSO users on this instance
+        enforced: false,
+        // Allow users to add an additional CryptPad password to their SSO account
+        cpPassword: true,
+        // You can also force your SSO users to add a CryptPad password
+        forceCpPassword: true,
+        // List of SSO providers
+        list: [
+                {
+                        name: "keycloak",
+                        type: "oidc",
+                        url: "https://<keycloakserver/realms/<realm>",
+                        client_id: "cryptpad",
+                        client_secret: "<clientsecret>",
+                        jwt_alg: "RS256", // (deprecated)
+                        id_token_alg: "PS256", // (optional)
+                        userinfo_token_alg: "PS256", // (optional)
+                        username_scope: "profile", // (optional)
+                        username_claim: "name", // (optional)
+                        use_pkce: true, // (optional)
+                        use_nonce: true, // (optional)
+                },
+                /*
 
     // Sample Univention UCS Configuration (using Kopano Connect)
     {
-        name: 'xwiki', 
+        name: 'xwiki',
         type: 'oidc',
         url: 'https://ucs-sso.<yourdomain>',
         client_id: "cryptpad",
@@ -99,11 +99,11 @@ module.exports = {
         url: 'https://accounts.google.com',
         client_id: "{your_client_id}",
         client_secret: "{your_client_secret}",
-        jwt_alg: 'RS256' (optional)
+        jwt_alg: 'RS256' // (optional)
     },
     // Sample SAML Configuration
     {
-        name: 'samltest',  
+        name: 'samltest',
         type: 'saml',
         url: 'https://samltest.id/idp/profile/SAML2/Redirect/SSO',
         issuer: 'your-cryptpad-issuer-id',
@@ -112,6 +112,6 @@ module.exports = {
         signingCert: fs.readFileSync("./your/signing/cert/location", "utf-8"),
     }
     */
-    ]
+        ],
 };
 ```
