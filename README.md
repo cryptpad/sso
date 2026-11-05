@@ -30,23 +30,12 @@ If you are interested in these extra features and wish to sponsor them, contact 
 ```
 cd cryptpad/lib/plugins
 git clone https://github.com/cryptpad/sso/
+npm ci
 ```
 
-2. Go to the cryptpad/config directory on your server
+2. Edit the SSO configuration on the CryptPad admin UI
 
-```
-cd ../../config
-cp sso.example.js sso.js
-```
-
-3. Edit the `sso.js` config file to set the credentials to your SSO server ([more instructions here](#ssojs-sample-configurations))
-
-4. Flush the cache on your Cryptpad instance
-
-On the web interface, login, and then go to:
-Administration > General (default) > Flush HTTP Cache > click "FLUSH CACHE"
-
-> At this point you may be done, but if issues persist try restarting your Cryptpad instance with `systemctl restart ...`, `service ... restart`, or `reboot`
+3. Restart the CryptPad server
 
 ## Create an OpenID Connect Configuration on your authentication server
 
@@ -57,7 +46,7 @@ When setting up the client credentials on your OpenIDC Connect server the follow
 
 (In case you are still using a local test http server the URL should be `http://<yourdomain>:<yourport>/ssoauth`)
 
-### sso.js sample configurations
+## (DEPRECATED) sso.js sample configurations
 
 Here follows an example configuration file for `sso.js` showing examples for KeyCloak, Univention UCS and SAML:
 
